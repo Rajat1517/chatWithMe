@@ -1,0 +1,162 @@
+"use client"
+
+import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
+
+
+type Chat = {
+  role: "user" | "assistant";
+  content: string;
+  image?: string;
+};
+
+async function askGemini(messages: Chat[]): Promise<string> {
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages }),
+    });
+    if (!res.ok) throw new Error("API error");
+    const data = await res.json();
+    return data.text;
+  } catch {
+    return "Sorry, I couldn't process your request. Please try again.";
+  }
+}
+
+const quickQuestions = [
+  {
+    question: "Who are you?",
+    answer: "I'm Rajat, a passionate developer! ![Me](/me-avatar.png)",
+  },
+  {
+    question: "Show me a project",
+    answer: "Here's a project I'm proud of: ![Project Screenshot](/project1.png)",
+  },
+  // Add more as needed
+];
+
+export default function AIChat() {
+  const [messages, setMessages] = useState<Chat[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg: Chat = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+    setLoading(true);
+    const aiResponse = await askGemini([...messages, userMsg]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: aiResponse },
+    ]);
+    setLoading(false);
+  };
+
+  return (
+    <div
+      className="w-full max-w-lg mx-auto bg-gradient-to-br from-neutral-900 via-neutral-950 to-blue-900 shadow-2xl rounded-2xl p-4 border border-neutral-800 flex flex-col min-h-[70vh] h-[70vh] md:h-[75vh] relative"
+      role="region"
+      aria-label="AI Chat"
+    >
+      <div className="mb-2 font-bold text-lg text-neutral-100 flex items-center gap-2">
+        <svg width="24" height="24" fill="none" className="text-blue-400" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+          <circle cx="12" cy="12" r="4" fill="currentColor" />
+        </svg>
+        Ask Me Anything About Rajat!
+      </div>
+      <div className="flex flex-wrap gap-2 mb-3">
+        {quickQuestions.map((q, idx) => (
+          <button
+            key={idx}
+            className="bg-blue-800 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition"
+            onClick={() => {
+              setMessages((prev) => [
+                ...prev,
+                { role: "user", content: q.question },
+                { role: "assistant", content: q.answer },
+              ]);
+            }}
+            aria-label={q.question}
+          >
+            {q.question}
+          </button>
+        ))}
+      </div>
+      <div
+        className="flex-1 overflow-y-auto mb-3 border border-neutral-800 rounded-lg p-2 bg-neutral-800/80 transition-colors"
+        tabIndex={0}
+        aria-live="polite"
+      >
+        {messages.length === 0 && (
+          <div className="text-neutral-400 text-sm text-center py-8">
+            I am here to help you. You can ask me any question about Rajat.
+          </div>
+        )}
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`my-1 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <span
+              className={`px-3 py-2 rounded-xl max-w-[80%] break-words text-sm prose prose-invert
+                ${msg.role === "user"
+                  ? "bg-blue-600 text-white"
+                  : "bg-neutral-700 text-blue-200 border border-blue-900"
+                }`}
+              aria-label={msg.role === "user" ? "Your message" : "AI response"}
+            >
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" />
+                  )
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
+            </span>
+          </div>
+        ))}
+        {loading && (
+          <div className="my-1 flex justify-start">
+            <span className="px-3 py-2 rounded-xl max-w-[80%] break-words text-sm bg-neutral-700 text-blue-200 border border-blue-900 animate-pulse italic">
+              Processing...
+            </span>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="flex gap-2">
+        <input
+          className="flex-1 border border-neutral-700 bg-neutral-800 text-neutral-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          placeholder="Type your question…"
+          aria-label="Type your question"
+          disabled={loading}
+        />
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition disabled:opacity-50"
+          onClick={sendMessage}
+          disabled={!input.trim() || loading}
+          aria-label="Send message"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
