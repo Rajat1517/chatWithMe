@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 type Chat = {
@@ -10,21 +11,6 @@ type Chat = {
   content: string;
   image?: string;
 };
-
-async function askGemini(messages: Chat[]): Promise<string> {
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages }),
-    });
-    if (!res.ok) throw new Error("API error");
-    const data = await res.json();
-    return data.text;
-  } catch {
-    return "Sorry, I couldn't process your request. Please try again.";
-  }
-}
 
 const quickQuestions = [
   {
@@ -35,13 +21,13 @@ const quickQuestions = [
     question: "Show me a project",
     answer: "Here's a project I'm proud of: ![Project Screenshot](/project1.png)",
   },
-  // Add more as needed
 ];
 
 export default function AIChat() {
   const [messages, setMessages] = useState<Chat[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showQuick, setShowQuick] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
 
@@ -55,11 +41,24 @@ export default function AIChat() {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
-    const aiResponse = await askGemini([...messages, userMsg]);
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: aiResponse },
-    ]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...messages, userMsg] }),
+      });
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.text },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I couldn't process your request. Please try again." },
+      ]);
+    }
     setLoading(false);
   };
 
@@ -74,26 +73,55 @@ export default function AIChat() {
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
           <circle cx="12" cy="12" r="4" fill="currentColor" />
         </svg>
-        Ask Me Anything About Rajat!
+        Ask Me Anything!
       </div>
-      <div className="flex flex-wrap gap-2 mb-3">
-        {quickQuestions.map((q, idx) => (
-          <button
-            key={idx}
-            className="bg-blue-800 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition"
-            onClick={() => {
-              setMessages((prev) => [
-                ...prev,
-                { role: "user", content: q.question },
-                { role: "assistant", content: q.answer },
-              ]);
-            }}
-            aria-label={q.question}
-          >
-            {q.question}
-          </button>
-        ))}
+      <div className="flex items-center mb-2">
+        <button
+          className="text-xs text-blue-300 hover:text-blue-100 underline focus:outline-none mr-2"
+          onClick={() => setShowQuick((v) => !v)}
+          aria-label={showQuick ? "Hide quick questions" : "Show quick questions"}
+        >
+          {showQuick ? "Hide Quick Questions" : "Show Quick Questions"}
+        </button>
       </div>
+      {showQuick && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {quickQuestions.map((q, idx) => (
+            <button
+              key={idx}
+              className="bg-blue-800 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition"
+              onClick={async () => {
+                const userMsg = { role: "user", content: q.question };
+                setMessages((prev) => [...prev, userMsg]);
+                setLoading(true);
+                setShowQuick(false);
+                try {
+                  const res = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ messages: [...messages, userMsg] }),
+                  });
+                  if (!res.ok) throw new Error("API error");
+                  const data = await res.json();
+                  setMessages((prev) => [
+                    ...prev,
+                    { role: "assistant", content: data.text },
+                  ]);
+                } catch {
+                  setMessages((prev) => [
+                    ...prev,
+                    { role: "assistant", content: "Sorry, I couldn't process your request. Please try again." },
+                  ]);
+                }
+                setLoading(false);
+              }}
+              aria-label={q.question}
+            >
+              {q.question}
+            </button>
+          ))}
+        </div>
+      )}
       <div
         className="flex-1 overflow-y-auto mb-3 border border-neutral-800 rounded-lg p-2 bg-neutral-800/80 transition-colors"
         tabIndex={0}
@@ -104,31 +132,38 @@ export default function AIChat() {
             I am here to help you. You can ask me any question about Rajat.
           </div>
         )}
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`my-1 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <span
-              className={`px-3 py-2 rounded-xl max-w-[80%] break-words text-sm prose prose-invert
-                ${msg.role === "user"
-                  ? "bg-blue-600 text-white"
-                  : "bg-neutral-700 text-blue-200 border border-blue-900"
-                }`}
-              aria-label={msg.role === "user" ? "Your message" : "AI response"}
+        <AnimatePresence initial={false}>
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`my-1 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <ReactMarkdown rehypePlugins={[rehypeSanitize]}
-                components={{
-                  a: ({ node, ...props }) => (
-                    <a {...props} target="_blank" rel="noopener noreferrer" />
-                  )
-                }}
-              >
-                {msg.content}
-              </ReactMarkdown>
-            </span>
-          </div>
-        ))}
+              {msg.role === "assistant" ? (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30, opacity: { duration: 0.8 } }}
+                  className="px-3 py-2 rounded-xl max-w-[80%] break-words text-sm prose prose-invert bg-neutral-700 text-blue-200 border border-blue-900"
+                  aria-label="AI response"
+                >
+                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                    {typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)}
+                  </ReactMarkdown>
+                </motion.span>
+              ) : (
+                <span
+                  className="px-3 py-2 rounded-xl max-w-[80%] break-words text-sm prose prose-invert bg-blue-600 text-white"
+                  aria-label="Your message"
+                >
+                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                    {typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)}
+                  </ReactMarkdown>
+                </span>
+              )}
+            </div>
+          ))}
+        </AnimatePresence>
         {loading && (
           <div className="my-1 flex justify-start">
             <span className="px-3 py-2 rounded-xl max-w-[80%] break-words text-sm bg-neutral-700 text-blue-200 border border-blue-900 animate-pulse italic">
