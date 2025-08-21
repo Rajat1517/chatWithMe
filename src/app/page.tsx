@@ -10,7 +10,7 @@ export default function Home() {
         {/* Replace with your avatar */}
         <div className="w-28 h-28 bg-gradient-to-br from-blue-700 via-blue-400 to-blue-200 rounded-full mb-4 border-4 border-blue-900 shadow-lg" />
         <h1 className="text-4xl font-extrabold text-neutral-100 mb-2 tracking-tight drop-shadow-lg">
-          [Your Name]
+          Rajat Mishra
         </h1>
       </header>
       <section className="w-full max-w-lg flex flex-col items-center z-10 relative">

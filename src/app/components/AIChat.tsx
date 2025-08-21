@@ -147,7 +147,19 @@ export default function AIChat() {
                   className="px-3 py-2 rounded-xl max-w-[80%] break-words text-sm prose prose-invert bg-neutral-700 text-blue-200 border border-blue-900"
                   aria-label="AI response"
                 >
-                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeSanitize]}
+                    components={{
+                      a: (props) => (
+                        <a
+                          {...props}
+                          className="text-blue-600 underline hover:text-blue-300"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      ),
+                    }}
+                  >
                     {typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)}
                   </ReactMarkdown>
                 </motion.span>
