@@ -291,7 +291,6 @@ export async function POST(req: Request) {
       return result.toDataStreamResponse({ getErrorMessage: errorHandler });
     }
 
-
     const result = await generateText({
       model: google('gemini-2.5-flash'),
       messages,
@@ -309,17 +308,63 @@ export async function POST(req: Request) {
       },
     });
 
-    // If the model wants to call a tool, return the tool output directly (no follow-up model call)
+    // If the model wants to call a tool, use the tool output as context and let the model generate a final response
     const step = result.steps?.[0];
+    console.log("Step object:", JSON.stringify(step, null, 2));
     if (step?.finishReason === "tool-calls" && step.toolResults?.length) {
-      const toolOutput = step.toolResults[0].output;
+      console.log("toolResults[0]:", JSON.stringify(step.toolResults[0], null, 2));
+      const toolOutput = step.toolResults[0];
+      if (!toolOutput) {
+        console.error("Tool output is undefined!", step.toolResults);
+        return new Response(
+          JSON.stringify({ error: "Tool output is undefined." }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+      }
       const outputString = typeof toolOutput === "string" ? toolOutput : JSON.stringify(toolOutput);
-      return new Response(JSON.stringify({ text: outputString }), {
+
+      const followupPrompt = {
+        role: "system",
+        content: `
+You just received the following tool output as context for the user's question. 
+ONLY use this tool output as your factual source. 
+Do NOT invent, summarize, or add information not present in the tool output.
+If the user asks again for the same info, politely mention you've already shared it.
+Respond in a conversational, concise, and friendly way, referencing the tool output as your context.
+
+Tool output:
+${outputString}
+        `.trim()
+      };
+
+      const followupMessages = [
+        followupPrompt,
+        ...messages.slice(1), // skip the system prompt already added
+        { role: "assistant", content: outputString }
+      ];
+
+      const followup = await generateText({
+        model: google('gemini-2.5-flash'),
+        messages: followupMessages,
+        maxSteps: 1,
+        providerOptions: {
+          google: {
+            safetySettings: [
+              { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+            ],
+          },
+        },
+      });
+
+      return new Response(JSON.stringify({ text: followup.text }), {
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    console.log("No tool call");
+    // Otherwise, return the normal text
     return new Response(JSON.stringify({ text: result.text }), {
       headers: { "Content-Type": "application/json" },
     });
