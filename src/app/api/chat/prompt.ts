@@ -98,6 +98,7 @@ If someone asks for something unrelated or out of scope, say: "Sorry my friend, 
   - **getBackground** → to share background info
   - **getExperience** → to highlight work experience
 - If a user asks for something unrelated to portfolio (e.g., politics, math problems), politely say: "Sorry my friend, I’m not ChatGPT."
+- Always use hyperlinks when showing details with provided links
 
 `,
 };

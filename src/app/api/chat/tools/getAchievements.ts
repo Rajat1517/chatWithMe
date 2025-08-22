@@ -46,13 +46,13 @@ function achievementsToMarkdown() {
     return achievementsData
         .map(
             (ach) => `### ${ach.title} (${ach.year})
-${ach.description}`
+${ach.description}${ach.certificate_link ? `\n[View Certificate](${ach.certificate_link})` : ''}`
         )
         .join("\n\n");
 }
 
 export const getAchievements = tool({
-    description: "This tool shows my notable achievements.",
+    description: "This tool shows my notable achievements in competitive programming and contests.",
     parameters: z.object({}),
     execute: async () => {
         return achievementsToMarkdown().trim();

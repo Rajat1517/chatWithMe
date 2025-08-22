@@ -5,7 +5,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import Query from "./query";
 import type { Chat } from "./tldr";
 
-export default function chat({ setMode, messages, setMessages }: {
+export default function Chat({ setMode, messages, setMessages }: {
     setMode: React.Dispatch<SetStateAction<boolean>>,
     messages: Chat[],
     setMessages: React.Dispatch<React.SetStateAction<Chat[]>>
@@ -55,9 +55,11 @@ export default function chat({ setMode, messages, setMessages }: {
                             <ReactMarkdown
                                 rehypePlugins={[rehypeSanitize]}
                                 components={{
-                                    a: ({ node, ...props }) => (
+                                    a: ({ node,...props }) => {
+                                        console.log(node)
+                                        return(
                                         <a {...props} target="_blank" rel="noopener noreferrer" />
-                                    )
+                                    )}
                                 }}
                             >
                                 {chat.content}

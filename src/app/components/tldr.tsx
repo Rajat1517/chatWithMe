@@ -7,7 +7,7 @@ export type Chat = {
     content: string
 }
 
-export default function tldr() {
+export default function Tldr() {
     const [mode, setMode] = useState(false);
     const [messages, setMessages] = useState<Chat[]>([]);
     return (

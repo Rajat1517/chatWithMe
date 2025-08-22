@@ -141,8 +141,8 @@ export default function AIChat() {
               key={idx}
               className="bg-blue-800 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition"
               onClick={async () => {
-                const userMsg = { role: "user", content: q.question };
-                setMessages((prev) => [...prev, userMsg]);
+                const userMsg: Chat = { role: "user", content: q.question };
+                setMessages((prev: Chat[]) => [...prev, userMsg]);
                 setLoading(true);
                 try {
                   const res = await fetch("/api/chat", {

@@ -26,16 +26,18 @@ export default function Query({ messages, setMessages, loading, setLoading }: Pr
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ messages: newMessages }),
             });
-            console.log("Response from API:", res);
+            //console.log("Response from API:", res);
             if (res.status !== 200)
                 throw new Error(`Error: ${res.status}`);
             const data = await res.json();
             setMessages([...newMessages, { role: "assistant", content: data.text }]);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error fetching response:", error);
-            setMessages([...newMessages, { role: "assistant", content: error.message || "An error occurred while fetching the response" }]);
-            setLoading(false);
+            if (error instanceof Error) {
+                setMessages([...newMessages, { role: "assistant", content: error.message || "An error occurred while fetching the response" }]);
+                setLoading(false);
+            }
         }
     };
 

@@ -231,7 +231,7 @@
 
 
 import { google } from '@ai-sdk/google';
-import { generateText, streamText } from 'ai';
+import { generateText } from 'ai';
 import { SYSTEM_PROMPT } from './prompt';
 import { getContact } from './tools/getContacts';
 import { getProjects } from './tools/getProjects';
@@ -262,7 +262,7 @@ function errorHandler(error: unknown): string {
 
 export async function POST(req: Request) {
   try {
-    const { messages, stream } = await req.json();
+    const { messages } = await req.json();
 
     if (!Array.isArray(messages)) throw new Error('Messages must be an array');
 
@@ -280,32 +280,31 @@ export async function POST(req: Request) {
     };
 
     // If stream is true, use streamText (for future use)
-    if (stream) {
-      const result = streamText({
-        model: google('gemini-2.5-flash'),
-        messages,
-        toolCallStreaming: true,
-        tools,
-        maxSteps: 2,
-        providerOptions: {
-          google: {
-            safetySettings: [
-              { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-            ],
-          },
-        },
-      });
-      return result.toDataStreamResponse({ getErrorMessage: errorHandler });
-    }
+    // if (stream) {
+    //   const result = streamText({
+    //     model: google('gemini-2.5-flash'),
+    //     messages,
+    //     onToolCall: true,
+    //     tools,
+    //     maxSteps: 2,
+    //     providerOptions: {
+    //       google: {
+    //         safetySettings: [
+    //           { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+    //           { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
+    //           { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+    //           { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+    //         ],
+    //       },
+    //     },
+    //   });
+    //   return result.toDataStreamResponse({ getErrorMessage: errorHandler });
+    // }
 
     const result = await generateText({
       model: google('gemini-2.5-flash'),
       messages,
       tools,
-      maxSteps: 2,
       providerOptions: {
         google: {
           safetySettings: [
@@ -320,9 +319,9 @@ export async function POST(req: Request) {
 
     // If the model wants to call a tool, use the tool output as context and let the model generate a final response
     const step = result.steps?.[0];
-    console.log("Step object:", JSON.stringify(step, null, 2));
+    //console.log("Step object:", JSON.stringify(step, null, 2));
     if (step?.finishReason === "tool-calls" && step.toolResults?.length) {
-      console.log("toolResults[0]:", JSON.stringify(step.toolResults[0], null, 2));
+     // console.log("toolResults[0]:", JSON.stringify(step.toolResults[0], null, 2));
       const toolOutput = step.toolResults[0];
       if (!toolOutput) {
         console.error("Tool output is undefined!", step.toolResults);
@@ -356,7 +355,7 @@ ${outputString}
       const followup = await generateText({
         model: google('gemini-2.5-flash'),
         messages: followupMessages,
-        maxSteps: 1,
+        // maxSteps: 1,
         providerOptions: {
           google: {
             safetySettings: [
