@@ -50,6 +50,10 @@ body {
   transform-origin: left top;
 }
 
+button{
+  cursor: pointer;
+}
+
 
 @keyframes produce-right-top {
   from{

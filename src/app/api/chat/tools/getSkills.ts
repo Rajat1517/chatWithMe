@@ -26,9 +26,19 @@ const skillsData = [
       "C++",
       "Java",
       "Typescript",
-      "Git",
-      "GitHub",
+      "Javascript",
+      "SQL",
     ],
+  },
+  {
+    category:"Backend and Database",
+    skills:[
+      "NodeJs",
+      "ExpressJs",
+      "MongoDB",
+      "Mongoose",
+      "MySQL"
+    ]
   },
   {
     category: "Soft Skills",
@@ -43,18 +53,15 @@ const skillsData = [
     ],
   },
   {
-    category: "AI & Fullstack Engineering",
-    skills: [
-      "LLM Providers (ChatGPT, Whisper, Groq, Mistral & Claude)",
-      "AI Agents",
-      "Prompt engineering",
-      "Vector databases (Weaviate, Pinecone)",
-      "RAG (Retrieval-Augmented Generation)",
-      "Tool routing & calling",
-      "Hugging Face Transformers",
-      "Vercel AI SDK",
-    ],
-  },
+    category:"Utilities",
+    skills:[
+      "Git",
+      "Github",
+      "Firebase",
+      "Azure AI",
+      "Tailwind CSS"
+    ]
+  }
 ];
 
 // Helper to format as Markdown

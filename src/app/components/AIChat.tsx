@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaFilePdf } from "react-icons/fa";
+import { FiChevronDown } from "react-icons/fi";
 
 
 type Chat = {
@@ -15,12 +17,43 @@ type Chat = {
 const quickQuestions = [
   {
     question: "Who are you?",
-    answer: "I'm Rajat, a passionate developer! ![Me](/me-avatar.png)",
+    view: "Summary",
   },
   {
-    question: "Show me a project",
-    answer: "Here's a project I'm proud of: ![Project Screenshot](/project1.png)",
+    question: "Show me a project of yours.",
+    view: "Project",
   },
+  {
+    question: "Mention your overall skills. What are your tehcinical interests?",
+    view: "Skills",
+  },
+  {
+    question: "What is your professional experience? What work do you do?",
+    view: "Experience",
+
+  },
+  {
+    question: "Tell me about your educational details?",
+    view: "Education",
+
+  },
+  {
+    question: "Tell me some of your acheivements?",
+    view: "Achievements",
+
+  },
+  {
+    question: "How can I contact you ?",
+    view: "Contact",
+
+  },
+
+  {
+    question: "Can you show me your formal resume?",
+    view: "Resume",
+  },
+
+
 ];
 
 export default function AIChat() {
@@ -64,7 +97,7 @@ export default function AIChat() {
 
   return (
     <div
-      className="w-full max-w-lg mx-auto bg-gradient-to-br from-neutral-900 via-neutral-950 to-blue-900 shadow-2xl rounded-2xl p-4 border border-neutral-800 flex flex-col min-h-[70vh] h-[70vh] md:h-[75vh] relative"
+      className="w-full max-w-3xl mx-auto bg-gradient-to-br from-neutral-900 via-neutral-950 to-blue-900 shadow-2xl rounded-2xl p-4 border border-neutral-800 flex flex-col min-h-[70vh] h-[70vh] md:h-[75vh] relative"
       role="region"
       aria-label="AI Chat"
     >
@@ -75,7 +108,7 @@ export default function AIChat() {
         </svg>
         Ask Me Anything!
       </div>
-      <div className="flex items-center mb-2">
+      {/* <div className="flex items-center mb-2">
         <button
           className="text-xs text-blue-300 hover:text-blue-100 underline focus:outline-none mr-2"
           onClick={() => setShowQuick((v) => !v)}
@@ -83,9 +116,26 @@ export default function AIChat() {
         >
           {showQuick ? "Hide Quick Questions" : "Show Quick Questions"}
         </button>
-      </div>
+      </div> */}
+      <button
+        onClick={() => setShowQuick((prev) => !prev)}
+        className="flex items-center gap-2 text-blue-400"
+      >
+        Quick Questions
+        <motion.span
+          animate={{ rotate: showQuick ? 180 : 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <FiChevronDown size={20} />
+        </motion.span>
+      </button>
       {showQuick && (
-        <div className="flex flex-wrap gap-2 mb-3">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="flex flex-wrap gap-2 mb-3"
+        >
           {quickQuestions.map((q, idx) => (
             <button
               key={idx}
@@ -94,7 +144,6 @@ export default function AIChat() {
                 const userMsg = { role: "user", content: q.question };
                 setMessages((prev) => [...prev, userMsg]);
                 setLoading(true);
-                setShowQuick(false);
                 try {
                   const res = await fetch("/api/chat", {
                     method: "POST",
@@ -117,10 +166,10 @@ export default function AIChat() {
               }}
               aria-label={q.question}
             >
-              {q.question}
+              {q.view}
             </button>
           ))}
-        </div>
+        </motion.div>
       )}
       <div
         className="flex-1 overflow-y-auto mb-3 border border-neutral-800 rounded-lg p-2 bg-neutral-800/80 transition-colors"
@@ -129,7 +178,7 @@ export default function AIChat() {
       >
         {messages.length === 0 && (
           <div className="text-neutral-400 text-sm text-center py-8">
-            I am here to help you. You can ask me any question about Rajat.
+            How can I help you today?
           </div>
         )}
         <AnimatePresence initial={false}>
@@ -150,14 +199,25 @@ export default function AIChat() {
                   <ReactMarkdown
                     rehypePlugins={[rehypeSanitize]}
                     components={{
-                      a: (props) => (
-                        <a
-                          {...props}
-                          className="text-blue-600 underline hover:text-blue-300"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        />
-                      ),
+                      a: (props) => {
+                        const isPdf = typeof props.href === "string" && props.href.endsWith(".pdf");
+                        return (
+                          <a
+                            {...props}
+                            className={
+                              isPdf
+                                ? "text-red-300 underline hover:text-red-500 flex items-center gap-1"
+                                : "text-blue-600 underline hover:text-blue-300"
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={isPdf ? true : undefined}
+                          >
+                            {props.children}
+                            {isPdf && <FaFilePdf className="inline ml-1" />}
+                          </a>
+                        );
+                      },
                     }}
                   >
                     {typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)}

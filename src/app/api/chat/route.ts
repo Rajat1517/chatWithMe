@@ -236,6 +236,11 @@ import { SYSTEM_PROMPT } from './prompt';
 import { getContact } from './tools/getContacts';
 import { getProjects } from './tools/getProjects';
 import { getSkills } from './tools/getSkills';
+import { getExperience } from './tools/getExperience';
+import { getAchievements } from './tools/getAchievements';
+import { getEducation } from './tools/getEducation';
+import { getResume } from './tools/getResume';
+import { getLocation } from './tools/getLocation';
 
 export const maxDuration = 30;
 
@@ -267,6 +272,11 @@ export async function POST(req: Request) {
       getProjects,
       getContact,
       getSkills,
+      getAchievements,
+      getExperience,
+      getEducation,
+      getResume,
+      getLocation
     };
 
     // If stream is true, use streamText (for future use)

@@ -67,6 +67,29 @@ export const PROJECT_CONTENT = [
                         }
                 ],
         },
+        {
+                title: 'npm: react-native-tts-reader',
+                description:
+                        'Published a fully tested, MIT-licensed tts reader library with multiple downloads. It leverages TTS while converting a string input into structured chunks with array simulation for play/pause features.',
+                techStack: [
+                        'React Native',
+                        'Typescript',
+                        'Android',
+                        'Text-to-Speech (TTS)',
+                        'Expo'
+                ],
+                date: '2025',
+                links: [
+                        {
+                                name: 'NPM Package',
+                                url: 'https://www.npmjs.com/package/react-native-tts-reader',
+                        },
+                        {
+                                name: 'Download Analytics',
+                                url: 'https://npm-stat.com/charts.html?package=react-native-tts-reader',
+                        },
+                ],
+        },
 ];
 
 // Helper to format as Markdown
