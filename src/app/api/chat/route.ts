@@ -321,7 +321,7 @@ export async function POST(req: Request) {
     const step = result.steps?.[0];
     //console.log("Step object:", JSON.stringify(step, null, 2));
     if (step?.finishReason === "tool-calls" && step.toolResults?.length) {
-     // console.log("toolResults[0]:", JSON.stringify(step.toolResults[0], null, 2));
+      // console.log("toolResults[0]:", JSON.stringify(step.toolResults[0], null, 2));
       const toolOutput = step.toolResults[0];
       if (!toolOutput) {
         console.error("Tool output is undefined!", step.toolResults);
@@ -340,6 +340,12 @@ ONLY use this tool output as your factual source.
 Do NOT invent, summarize, or add information not present in the tool output.
 If the user asks again for the same info, politely mention you've already shared it.
 Respond in a conversational, concise, and friendly way, referencing the tool output as your context.
+
+IMPORTANT FOR CONTACT INFO:
+- Preserve all Markdown links exactly as provided
+- Do not modify any URLs or contact details
+- Include ALL contact methods from the tool output
+- Keep the formatting intact
 
 Tool output:
 ${outputString}

@@ -14,37 +14,35 @@ const contactData = [
   },
   {
     type: "LinkedIn",
-    value: "linkedin.com/Rajat Mishra",
+    value: "Rajat Mishra",
     link: "https://www.linkedin.com/in/rajat-mishra-a215771ab/",
   },
   {
     type: "GitHub",
-    value: "github.com/Rajat Mishra",
+    value: "Rajat1517",
     link: "https://github.com/Rajat1517",
   },
   {
     type: "Portfolio",
-    value: "Rajat Mishra.com",
+    value: "portfolio-rjm.netlify.app",
     link: "https://portfolio-rjm.netlify.app/",
   },
 ];
 
 function contactsToMarkdown() {
-  return (
-    "Here are my contact details:\n\n" +
-    contactData
-      .map(
-        (c) =>
-          `- **${c.type}:** [${c.value}](${c.link})`
-      )
-      .join("\n")
-  );
+  return `Here's how you can reach me:
+
+${contactData
+  .map((c) => `- **${c.type}:** [${c.value}](${c.link})`)
+  .join("\n")}
+
+Feel free to connect with me on LinkedIn or check out my GitHub projects!`;
 }
 
 export const getContact = tool({
-  description: "This tool shows my contact information.",
+  description: "This tool shows my contact information with clickable links.",
   parameters: z.object({}),
-  execute: async () => {
+  execute: async (args, options) => {
     return contactsToMarkdown().trim();
   },
 });
