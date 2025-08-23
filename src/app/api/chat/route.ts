@@ -339,14 +339,7 @@ You just received the following tool output as context for the user's question.
 ONLY use this tool output as your factual source. 
 Do NOT invent, summarize, or add information not present in the tool output.
 If the user asks again for the same info, politely mention you've already shared it.
-Respond in a conversational, concise, and friendly way, referencing the tool output as your context.
-
-IMPORTANT FOR CONTACT INFO:
-- Preserve all Markdown links exactly as provided
-- Do not modify any URLs or contact details
-- Include ALL contact methods from the tool output
-- Keep the formatting intact
-
+Respond in a conversational, concise, and friendly way, referencing the tool output as your context. Always use hyperlinks for provided links, do not invent any random link.
 Tool output:
 ${outputString}
         `.trim()
