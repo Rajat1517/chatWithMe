@@ -42,7 +42,7 @@ Feel free to connect with me on LinkedIn or check out my GitHub projects!`;
 export const getContact = tool({
   description: "This tool shows my contact information with clickable links.",
   parameters: z.object({}),
-  execute: async (args, options) => {
+  execute: async () => {
     return contactsToMarkdown().trim();
   },
 });

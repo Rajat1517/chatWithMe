@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Rajat Mishra – AI-Powered Interactive Portfolio
 
-First, run the development server:
+>This is an interactive portfolio web app built with Next.js, TypeScript, Tailwind CSS, and Vercel AI SDK. It features an AI-powered chat that answers questions about Rajat's professional background, projects, skills, experience, education, achievements, and more.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **AI Chatbot**: Ask anything about Rajat's career, skills, projects, resume, and get smart, context-aware answers.
+- **Quick Questions**: One-click quick questions for instant info.
+- **Tool-Driven Responses**: All answers are powered by real data/tools, no hallucination.
+- **Beautiful UI**: Modern, responsive, accessible design with animated gradients and chat effects.
+- **Portfolio Sections**: Projects, Skills, Experience, Achievements, Education, Contact, Resume, Location, Competitive Programming.
+- **Downloadable Resume**: Direct PDF download and Google Drive view from chat.
+- **SEO Optimized**: Metadata for better discoverability.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 14+
+- React 18+
+- TypeScript
+- Tailwind CSS
+- Vercel AI SDK (Gemini, Claude, etc.)
+- Framer Motion (animations)
+- React Icons
 
-## Learn More
+## 🏁 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+1. Install dependencies:
+	```bash
+	npm install
+	# or
+	yarn install
+	```
+2. Run the development server:
+	```bash
+	npm run dev
+	```
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app/components/AIChat.tsx` – Chat UI and logic
+- `src/app/api/chat/tools/` – Data tools for projects, skills, experience, achievements, education, resume, contact, location, competitive programming
+- `public/` – Images, resume PDF, icons
+- `src/app/page.tsx` – Main landing page
 
-## Deploy on Vercel
+## ✨ How It Works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- The AI chat uses Gemini API and custom tools to answer questions about Rajat.
+- All data (projects, skills, etc.) is stored in structured JSON and Markdown for accuracy.
+- The UI is fully responsive, accessible, and animated for a modern experience.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+
+MIT
+
+---
+**Made by Rajat Mishra**
